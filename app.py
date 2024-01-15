@@ -8,10 +8,8 @@ from aws_cdk import (
     aws_lambda as lambda_,
     aws_s3 as s3,
     aws_lambda_event_sources as eventsources,
-    CfnOutput
+    CfnOutput,
 )
-import aws_cdk.aws_apigatewayv2_alpha as _apigw
-from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpLambdaIntegration
 from constructs import Construct
 
 DIRNAME = os.path.dirname(__file__)
@@ -76,7 +74,7 @@ class S3LambdaTranslateServerless(Stack):
                 "environment": "dev",
                 "src_lang": "auto",
                 "target_lang": "fr",
-                "destination_bucket": self.user_output_bucket.bucket_name
+                "destination_bucket": self.user_output_bucket.bucket_name,
             },
         )
 
@@ -88,7 +86,7 @@ class S3LambdaTranslateServerless(Stack):
                     "translate:TranslateDocument",
                     "comprehend:DetectDominantLanguage",
                     "s3:PutObject",
-                    "s3:GetObject"
+                    "s3:GetObject",
                 ],
                 resources=["*"],
             )
@@ -107,6 +105,7 @@ class S3LambdaTranslateServerless(Stack):
             description="S3 Translated Output Bucket",
             value=self.user_output_bucket.bucket_name,
         )
+
 
 app = cdk.App()
 filestack = S3LambdaTranslateServerless(app, "S3LambdaTranslateServerless")

@@ -14,13 +14,14 @@ target_lang = os.getenv("target_lang", "fr")
 s3 = boto3.client('s3')
 s3_res = boto3.resource("s3")
 dest_bucket = os.getenv("destination_bucket")
+status = "Translation failed, please check logs!!"
 
 
 def lambda_handler(event, context):
     """
     :param event: Input from the user, through a S3 bucket upload event
     :param context: Any methods and properties that provide information about the invocation, function, and execution environment
-    :return: THe response from Translate service after the translation of input document.
+    :return: The response from Translate service after the translation of input document.
     """
     try:
         LOG.info(f"Event is {event}")
@@ -33,7 +34,7 @@ def lambda_handler(event, context):
 
         obj = s3.get_object(Bucket=s3_bucket, Key=s3_file)
         data = obj['Body'].read()
-        LOG.info(f"Data collected is {data}")
+        # LOG.info(f"Data collected is {data}")
 
         result = translate_obj.translate_document(
             Document={
@@ -54,6 +55,10 @@ def lambda_handler(event, context):
 
             lambda_path = "/tmp/" + tmpfile
             s3_res.meta.client.upload_file(lambda_path, dest_bucket, tmpfile)
+            status = f"Success, the translated document is uploaded in the bucket {dest_bucket}"
+
+        LOG.info(status)
+        return status
 
     except Exception as e:
         LOG.error("Translate action failed!!")
