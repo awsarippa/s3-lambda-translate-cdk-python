@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_iam as iam,
     aws_lambda as lambda_,
     aws_s3 as s3,
+    aws_lambda_event_sources as eventsources,
     CfnOutput
 )
 import aws_cdk.aws_apigatewayv2_alpha as _apigw
@@ -69,7 +70,7 @@ class S3LambdaTranslateServerless(Stack):
             handler="lambda_function.lambda_handler",
             code=lambda_.Code.from_asset(os.path.join(DIRNAME, "src")),
             timeout=Duration.minutes(1),
-            layer=[layer],
+            layers=[layer],
             memory_size=256,
             environment={
                 "environment": "dev",
@@ -85,12 +86,26 @@ class S3LambdaTranslateServerless(Stack):
                 actions=[
                     "translate:TranslateText",
                     "translate:TranslateDocument",
-                    "comprehend:DetectDominantLanguage"
+                    "comprehend:DetectDominantLanguage",
                     "s3:PutObject",
                     "s3:GetObject"
                 ],
                 resources=["*"],
             )
+        )
+
+        lambda_function.add_event_source(
+            eventsources.S3EventSource(
+                self.user_input_bucket, events=[s3.EventType.OBJECT_CREATED]
+            )
+        )
+
+        # Outputs
+        CfnOutput(
+            self,
+            "S3 Output Bucket",
+            description="S3 Translated Output Bucket",
+            value=self.user_output_bucket.bucket_name,
         )
 
 app = cdk.App()
