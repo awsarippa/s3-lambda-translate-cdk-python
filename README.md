@@ -1,14 +1,14 @@
-# API Gateway -> Lambda -> Translate
-This patterns shows CDK deployment on how to leverage Amazon API Gateway, AWS Lambda, and Amazon Translate to perform language translation in a serverless fashion.
+# S3 -> Lambda -> Translate
+This patterns shows CDK deployment on how to leverage Amazon S3, AWS Lambda, and Amazon Translate to perform document language translation in a serverless fashion.
 
 ## Architecture
 ![Diagram](src/architecture.png)
 
 ### What resources will be created?
 This CDK code will create the following:
-   - One Lambda function (to invoke the Translate API)
-   - One API Gateway (to trigger the Lambda function with user input. The API Gateway does not perform any authorization or authentication of the incoming requests and this pattern should only be used for demonstration purposes only.)
-   - One IAM role (for the Lambda function to invoke Translate service)
+   - One Lambda function (to invoke the TranslateDocument API)
+   - Two S3 buckets (One bucket to accept the user input to trigger the Lambda function and the second bucket to capture the output from Translate service.)
+   - One IAM role (for the Lambda function to invoke Translate service, read and upload translated documents to S3 bucket.)
 
 ## Requirements
 
@@ -29,6 +29,7 @@ You must use a role that has sufficient permissions to create IAM roles, as well
 
 #### Python >=3.8
 Make sure you have [python3](https://www.python.org/downloads/) installed at a version >=3.8.x in the CDK environment. The demonstration uses python 3.10.
+Since `TranslateDocument` API is available only in the Boto3 version >= 1.28.57, a layer `python.zip` has been attached.
 
 #### AWS CDK
 Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) installed in the Cloud9 environment.
@@ -39,7 +40,7 @@ Make sure you have the [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/gettin
 ### Set up environment and gather packages
 
 ```
-cd apigw-lambda-translate-cdk
+cd s3-lambda-translate-cdk-python
 ```
 
 Install the required dependencies (aws-cdk-lib and constructs) into your Python environment 
@@ -62,28 +63,26 @@ and deploy with
 cdk deploy
 ```
 
-The deployment will create a API Gateway and a Lambda function.
+The deployment will create two S3 buckets and a Lambda function.
 
 ## How it works
-The API Gateway handles the incoming requests from the user and it invokes the relevant route. The Lambda function, triggered by API Gateway, invokes the Translate's TranslateText API and the analyzed response from Translate is routed back to the requester. The target language for translation is set to French by default and users are requested to change it as per their use-case.
+The S3 bucket acts as a placeholder to upload the document, required for performing language translation. In the demonstration, we use the file `AmazonSimpleStorageService.html` inside the `assets` folder. 
+When the file is uploaded to input S3 bucket, the Lambda function is triggered. 
+The Lambda function invokes the Translate's `TranslateDocument` API  and the response document with the nomenclature `target_language`-`source_file_name` is uploaded to the output S3 bucket. 
+The target language for translation is set to French by default and users are requested to change it as per their use-case.
+At the time of creating this pattern, `TranslateDocument` API supports three formats of document:
+   - `text/html` - The input data consists of HTML content. Amazon Translate translates only the text in the HTML element.
+   - `text/plain` -  The input data consists of unformatted text. Amazon Translate translates every character in the content.
+   - `application/vnd.openxmlformats-officedocument.wordprocessingml.document` - The input data consists of a Word document (.docx).
+
+In this demonstration, we've chosen the `text/html` document format.
 
 ## Testing
-Upon successful deployment of the stack, the Output section would provide the `APIEndpoint` in the CDK environment. Alternatively, the `APIEndpoint` can be found from the Outputs section of the `CloudFormation` stack.
-
-Use the below format to the test the API (replace the API Endpoint with the one retrieved from the above step):
-```bash
-curl -d '{"input": "I love AWS Services."}' -H 'Content-Type: application/json' https://<abcdefg>.execute-api.<region>.amazonaws.com/TranslateText
-```
-
-A response as below would be seen on the terminal console:
-```
-{
-    "Translated Text": "J'adore AWS Services.",
-    "statusCode": 200,
-    "Source Text": "I love AWS Services."
-}
-```
+Upon successful deployment of the stack, the Output section would provide the names for the S3 buckets from the variables `S3InputBucket` and `S3OutputBucket` in the CDK environment. 
+Alternatively, these values can be found from the Outputs section of the `CloudFormation` stack.
+Upload the sample file `assets\AmazonSimpleStorageService.html` into the input S3 bucket. The upload action triggers the Lambda function and the document is analyzed. 
+The translated document is stored in the output S3 bucket. In this demonstration, we have chosen to use a html document to convert it to `French` language. 
+Hence, the converted document would look similar to `assets\fr-AmazonSimpleStorageService.html`.
 
 ## Cleanup
-
-To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `apigw-lambda-translate-cdk`. In addition, users are advised to terminate the Cloud9 EC2 instance to avoid any unexpected charges.
+To clean up the resources created as part of this demonstration, run the command `cdk destroy` in the directory `s3-lambda-translate-cdk-python`. In addition, users are advised to terminate the Cloud9 EC2 instance to avoid any unexpected charges.

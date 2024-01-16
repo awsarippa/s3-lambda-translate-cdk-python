@@ -1,20 +1,20 @@
 {
-    "title": "API Gateway - Lambda - Translate",
-    "description": "Perform language translation using Translate through Lambda and API Gateway",
+    "title": "S3 - Lambda - Translate",
+    "description": "Perform document language translation using Translate through Lambda and S3",
     "language": "Python",
     "level": "200",
     "framework": "CDK",
     "introBox": {
       "headline": "How it works",
       "text": [
-        "This patterns shows CDK deployment on how to leverage Amazon API Gateway, AWS Lambda, and Amazon Translate to perform language translation in a serverless fashion."
+        "This patterns shows CDK deployment on how to leverage Amazon Amazon S3, AWS Lambda, and Amazon Translate to perform language translation in a serverless fashion."
       ]
     },
     "gitHub": {
       "template": {
-        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/apigw-lambda-translate-cdk",
-        "templateURL": "serverless-patterns/apigw-lambda-translate-cdk",
-        "projectFolder": "apigw-lambda-translate-cdk",
+        "repoURL": "https://github.com/aws-samples/serverless-patterns/tree/main/s3-lambda-translate-cdk-python",
+        "templateURL": "serverless-patterns/s3-lambda-translate-cdk-python",
+        "projectFolder": "s3-lambda-translate-cdk-python",
         "templateFile": "app.py"
       }
     },
@@ -25,16 +25,12 @@
           "link": "https://docs.aws.amazon.com/translate/latest/dg/what-is.html"
         },
         {
-          "text": "Amazon Translate Features",
-          "Link": "https://aws.amazon.com/translate/"
+          "text": "Amazon Translate Document API",
+          "Link": "https://docs.aws.amazon.com/translate/latest/APIReference/API_TranslateDocument.html"
         },
         {
-          "text": "Amazon API Gateway",
-          "link": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
-        },
-        {
-          "text": "Amazon API Gateway Features",
-          "link": "https://aws.amazon.com/api-gateway/"
+          "text": "AWS Lambda",
+          "link": "https://aws.amazon.com/lambda/"
         }
       ]
     },

@@ -105,6 +105,12 @@ class S3LambdaTranslateServerless(Stack):
             description="S3 Translated Output Bucket",
             value=self.user_output_bucket.bucket_name,
         )
+        CfnOutput(
+            self,
+            "S3 Input Bucket",
+            description="S3 Input Bucket",
+            value=self.user_input_bucket.bucket_name,
+        )
 
 
 app = cdk.App()

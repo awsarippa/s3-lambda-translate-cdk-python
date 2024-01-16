@@ -1,13 +1,17 @@
 
-### Project Structure within apigw-lambda-translate:
+### Project Structure within s3-lambda-translate-cdk-python:
 ```
-apigw-lambda-translate-cdk
+s3-lambda-translate-cdk-python
 - app.py
 - cdk.json
 - src/
    - lambda_function.py
    - architecture.png
 - requirements.txt
+- assets/
+    - AmazonSimpleStorageService.html
+    - fr-AmazonSimpleStorageService.html
+- python.zip
 ```
 
 ## Common Errors & Troubleshooting
